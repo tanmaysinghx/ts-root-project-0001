@@ -1,49 +1,45 @@
 pipeline {
-    agent any
+  agent any
 
-    environment {
-        SERVICE_NAME = 'ts-auth-service-1625'
-        SERVICE_REPO = 'https://github.com/tanmaysinghx/ts-auth-service-1625.git'
-        SERVICE_PORT = '1625'
+  environment {
+    IMAGE_NAME = "tanmaysinghx/ts-auth-service-1625:latest"
+  }
+
+  stages {
+    stage('Clone Repo') {
+      steps {
+        dir('backend/ts-auth-service-1625') {
+          git url: 'https://github.com/tanmaysinghx/ts-auth-service-1625.git'
+        }
+      }
     }
 
-    stages {
-        stage('Clone Microservice Repo') {
-            steps {
-                dir("backend/${env.SERVICE_NAME}") {
-                    git credentialsId: 'github-pat', url: "${env.SERVICE_REPO}", branch: 'main'
-                }
-            }
+    stage('Docker Build') {
+      steps {
+        dir('backend/ts-auth-service-1625') {
+          sh 'docker build -t $IMAGE_NAME .'
         }
-
-        stage('Build with Docker Compose') {
-            steps {
-                sh "docker compose --env-file .env -f docker-compose.yml build ${env.SERVICE_NAME}"
-            }
-        }
-
-        stage('Start Service Container') {
-            steps {
-                sh "docker compose --env-file .env -f docker-compose.yml up -d ${env.SERVICE_NAME}"
-            }
-        }
-
-        stage('Expose via Ngrok') {
-            steps {
-                sh """
-                docker rm -f ngrok-${env.SERVICE_NAME} || true
-                docker run -d --name ngrok-${env.SERVICE_NAME} --net=host wernight/ngrok ngrok http ${env.SERVICE_PORT}
-                """
-            }
-        }
+      }
     }
 
-    post {
-        success {
-            echo "✅ Service ${env.SERVICE_NAME} deployed and exposed."
+    stage('Docker Push') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+          sh '''
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+            docker push $IMAGE_NAME
+          '''
         }
-        failure {
-            echo "❌ Deployment failed for ${env.SERVICE_NAME}."
-        }
+      }
     }
+  }
+
+  post {
+    success {
+      echo "✅ Image pushed to Docker Hub: $IMAGE_NAME"
+    }
+    failure {
+      echo "❌ Build or push failed."
+    }
+  }
 }

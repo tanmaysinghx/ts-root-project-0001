@@ -1,0 +1,9 @@
+.env
+backend/*
+frontend/*
+
+# But allow Docker compose & shared Jenkins files
+!backend/.gitkeep
+!frontend/.gitkeep
+docker-compose.yml
+jenkins/

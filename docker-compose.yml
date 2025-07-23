@@ -1,0 +1,125 @@
+version: '3.8'
+
+services:
+  # 1. Auth Service
+  ts-auth-service-1625:
+    build:
+      context: ./backend/ts-auth-service-1625
+      dockerfile: Dockerfile
+    ports:
+      - "1625:1625"
+    environment:
+      - DATABASE_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_1625}?ssl-mode=REQUIRED
+    volumes:
+      - ./backend/ts-auth-service-1625:/usr/src/app 
+    env_file:
+      - .env
+
+  # 2. API Gateway Service
+  ts-api-gateway-service-1605:
+    build:
+      context: ./backend/ts-api-gateway-service-1605
+      dockerfile: Dockerfile
+    ports:
+      - "1605:1605"
+    environment:
+      - DATABASE_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_1605}?ssl-mode=REQUIRED
+      - ENV=docker
+      - NODE_ENV=docker
+      - WORKFLOW_API_VERSION=v1
+      - WORKFLOW_URL_PREFIX=http://ts-workflow-engine-1606:1606
+    volumes:
+      - ./backend/ts-api-gateway-service-1605:/usr/src/app 
+    env_file:
+      - .env
+
+  # 3. Notification Service
+  ts-notification-service-1689:
+    build:
+      context: ./backend/ts-notification-service-1689
+      dockerfile: Dockerfile
+    ports:
+      - "1689:1689"
+    environment:
+      - DATABASE_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_1689}?ssl-mode=REQUIRED
+      - ENV=docker
+    volumes:
+      - ./backend/ts-notification-service-1689:/usr/src/app 
+    env_file:
+      - .env
+
+  # 4. Workflow Engine
+  ts-workflow-engine-1606:
+    build:
+      context: ./backend/ts-workflow-engine-1606
+      dockerfile: Dockerfile
+    ports:
+      - "1606:1606"
+    environment:
+      - DATABASE_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_1606}?ssl-mode=REQUIRED
+      - ENV=docker
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./backend/ts-workflow-engine-1606:/usr/src/app 
+    env_file:
+      - .env
+
+  # 5. Profile Engine
+  ts-profile-engine-1676:
+    build:
+      context: ./backend/ts-profile-engine-1676
+      dockerfile: Dockerfile
+    ports:
+      - "1676:1676"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_1625}?ssl-mode=REQUIRED
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASS}
+    env_file:
+      - .env
+
+  # 6. UMT Frontend
+  ts-umt-ui-1780:
+    build:
+      context: ./frontend/ts-umt-ui-1780  
+    ports:
+      - "1780:1780"
+
+  # 7. PMT Frontend
+  ts-pmt-ui-1725:
+    build:
+      context: ./frontend/ts-pmt-ui-1725  
+    ports:
+      - "1725:1725"
+
+  # 8. Redis
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  # 9. Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  # 10. Zookeeper
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000

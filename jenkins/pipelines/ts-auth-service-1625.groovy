@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         SERVICE_NAME = 'ts-auth-service-1625'
-        SERVICE_REPO = 'https://github.com/your-org/ts-auth-service-1625.git'
+        SERVICE_REPO = 'https://github.com/tanmaysinghx/ts-auth-service-1625.git'
         SERVICE_PORT = '1625'
     }
 
@@ -11,7 +11,7 @@ pipeline {
         stage('Clone Microservice Repo') {
             steps {
                 dir("backend/${env.SERVICE_NAME}") {
-                    git url: "${env.SERVICE_REPO}", branch: 'main'
+                    git credentialsId: 'github-pat', url: "${env.SERVICE_REPO}", branch: 'main'
                 }
             }
         }

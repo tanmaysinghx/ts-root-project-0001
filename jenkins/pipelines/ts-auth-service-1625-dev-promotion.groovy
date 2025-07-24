@@ -22,25 +22,26 @@ pipeline {
         }
 
         stage('Run Container with Mounted CA Cert') {
-            steps {
-                withCredentials([file(credentialsId: 'ts-auth-service-1625-ca-cert', variable: 'CA_CERT_PATH')]) {
-                    script {
-                        def fullDbUrl = "${DATABASE_URL_RAW}&ssl-ca=/app/ca.pem"
+    steps {
+        withCredentials([file(credentialsId: 'ts-auth-service-1625-ca-cert', variable: 'CA_CERT_PATH')]) {
+            script {
+                def fullDbUrl = "${DATABASE_URL_RAW}&ssl-ca=/app/ca.pem"
 
-                        sh """
-                            docker rm -f $CONTAINER_NAME || true
-                            docker run -d --name $CONTAINER_NAME \
-                              -p $EXPOSED_PORT:$INTERNAL_PORT \
-                              -e ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET \
-                              -e REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET \
-                              -e DATABASE_URL="${fullDbUrl}" \
-                              -v "$CA_CERT_PATH:/app/ca.pem" \
-                              $IMAGE_NAME
-                        """
-                    }
-                }
+                sh """
+                    docker rm -f $CONTAINER_NAME || true
+                    docker run -d --name $CONTAINER_NAME \
+                      -p $EXPOSED_PORT:$INTERNAL_PORT \
+                      -e ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET \
+                      -e REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET \
+                      -e DATABASE_URL='${fullDbUrl}' \
+                      -v "$CA_CERT_PATH:/app/ca.pem" \
+                      $IMAGE_NAME
+                """
             }
         }
+    }
+}
+
 
         stage('Start Ngrok Tunnel') {
             steps {

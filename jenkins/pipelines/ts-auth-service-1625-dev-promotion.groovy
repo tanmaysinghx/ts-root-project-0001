@@ -7,6 +7,11 @@ pipeline {
         NGROK_AUTH = credentials('ngrok-auth-token')
         EXPOSED_PORT = "1625"
         INTERNAL_PORT = "8080"
+
+        // 👇 Secure Secrets (stored in Jenkins credentials → Secret Text)
+        ACCESS_TOKEN_SECRET = credentials('access-token-secret')
+        REFRESH_TOKEN_SECRET = credentials('refresh-token-secret')
+        DATABASE_URL = credentials('auth-db-url')
     }
 
     stages {
@@ -20,7 +25,12 @@ pipeline {
             steps {
                 sh """
                     docker rm -f $CONTAINER_NAME || true
-                    docker run -d --name $CONTAINER_NAME -p $EXPOSED_PORT:$INTERNAL_PORT $IMAGE_NAME
+                    docker run -d --name $CONTAINER_NAME \
+                      -p $EXPOSED_PORT:$INTERNAL_PORT \
+                      -e ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET \
+                      -e REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET \
+                      -e DATABASE_URL=$DATABASE_URL \
+                      $IMAGE_NAME
                 """
             }
         }

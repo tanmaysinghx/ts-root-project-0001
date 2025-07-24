@@ -11,7 +11,7 @@ pipeline {
         // 👇 Secure Secrets (stored in Jenkins credentials → Secret Text)
         ACCESS_TOKEN_SECRET = credentials('access-token-secret')
         REFRESH_TOKEN_SECRET = credentials('refresh-token-secret')
-        DATABASE_URL = credentials('ts-auth-service-1625-db-url')
+        DATABASE_URL_RAW = credentials('ts-auth-service-1625-db-url')
     }
 
     stages {
@@ -21,17 +21,24 @@ pipeline {
             }
         }
 
-        stage('Run Container') {
+        stage('Run Container with Mounted CA Cert') {
             steps {
-                sh """
-                    docker rm -f $CONTAINER_NAME || true
-                    docker run -d --name $CONTAINER_NAME \
-                      -p $EXPOSED_PORT:$INTERNAL_PORT \
-                      -e ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET \
-                      -e REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET \
-                      -e DATABASE_URL=$DATABASE_URL \
-                      $IMAGE_NAME
-                """
+                withCredentials([file(credentialsId: 'ts-auth-service-1625-ca-cert', variable: 'CA_CERT_PATH')]) {
+                    script {
+                        def fullDbUrl = "${DATABASE_URL_RAW}&ssl-ca=/app/ca.pem"
+
+                        sh """
+                            docker rm -f $CONTAINER_NAME || true
+                            docker run -d --name $CONTAINER_NAME \
+                              -p $EXPOSED_PORT:$INTERNAL_PORT \
+                              -e ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET \
+                              -e REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET \
+                              -e DATABASE_URL="${fullDbUrl}" \
+                              -v "$CA_CERT_PATH:/app/ca.pem" \
+                              $IMAGE_NAME
+                        """
+                    }
+                }
             }
         }
 

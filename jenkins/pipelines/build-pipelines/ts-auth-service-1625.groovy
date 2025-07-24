@@ -1,57 +1,70 @@
 pipeline {
-    agent any
+  agent any
 
-    environment {
-        DOCKER_IMAGE = 'tanmaysinghx/ts-auth-service-1625:latest'
+  environment {
+    DOCKER_IMAGE = 'tanmaysinghx/ts-auth-service-1625:latest'
+
+    // Secrets stored in Jenkins Credentials as "Secret Text"
+    DATABASE_URL = credentials('TS_1625_DATABASE_URL')
+    ACCESS_TOKEN_SECRET = credentials('TS_1625_ACCESS_TOKEN_SECRET')
+    REFRESH_TOKEN_SECRET = credentials('TS_1625_REFRESH_TOKEN_SECRET')
+    DOCKER_USERNAME = credentials('DOCKER_USERNAME')
+    DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')
+  }
+
+  stages {
+    stage('Checkout Code') {
+      steps {
+        git branch: 'main', url: 'https://github.com/tanmaysinghx/ts-auth-service-1625.git'
+      }
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git url: 'https://github.com/tanmaysinghx/ts-auth-service-1625.git', branch: 'main'
-            }
-        }
-
-        stage('Install & Build in Node Container') {
-            steps {
-                script {
-                    docker.image('node:18').inside('-u root') {
-                        sh 'npm install'
-                        sh 'npm run build'
-                    }
-                }
-            }
-        }
-
-        stage('Login to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh '''
-                        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-                    '''
-                }
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                sh 'docker push $DOCKER_IMAGE'
-            }
-        }
+    stage('Generate .env') {
+      steps {
+        writeFile file: '.env', text: """
+DATABASE_URL=${DATABASE_URL}
+ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+"""
+      }
     }
 
-    post {
-        success {
-            echo "✅ Successfully pushed image: $DOCKER_IMAGE"
-        }
-        failure {
-            echo "❌ Build or push failed!"
-        }
+    stage('Docker Login') {
+      steps {
+        sh "echo '${DOCKER_PASSWORD}' | docker login -u '${DOCKER_USERNAME}' --password-stdin"
+      }
     }
+
+    stage('Build Docker Image') {
+      steps {
+        // Build image without copying .env
+        sh 'docker build -t ${DOCKER_IMAGE} .'
+      }
+    }
+
+    stage('Push Docker Image') {
+      steps {
+        sh 'docker push ${DOCKER_IMAGE}'
+      }
+    }
+
+    stage('Deploy Container') {
+      steps {
+        sh 'docker stop ts-auth-service-1625 || true && docker rm ts-auth-service-1625 || true'
+        sh 'docker run -d --name ts-auth-service-1625 --env-file .env -p 1625:1625 ${DOCKER_IMAGE}'
+      }
+    }
+  }
+
+  post {
+    always {
+      sh 'rm -f .env || true'
+    }
+    success {
+      echo '✅ Deployment successful.'
+    }
+    failure {
+      echo '❌ Deployment failed.'
+    }
+  }
 }

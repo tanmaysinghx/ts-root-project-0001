@@ -1,5 +1,7 @@
 pipeline {
-  agent any
+  agent {
+    label 'docker-enabled-node' // Ensure Jenkins agent has Docker access
+  }
 
   environment {
     IMAGE_NAME = "tanmaysinghx/ts-auth-service-1625:latest"
@@ -20,7 +22,13 @@ pipeline {
       }
     }
 
-    stage('Install & Build') {
+    stage('Install & Build in Node Docker') {
+      agent {
+        docker {
+          image 'node:18'
+          args '-u root' // allow installing if any permission issues
+        }
+      }
       steps {
         dir('backend/ts-auth-service-1625') {
           sh 'npm install'

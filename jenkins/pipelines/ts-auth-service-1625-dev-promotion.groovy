@@ -16,20 +16,24 @@ pipeline {
             }
         }
 
-        stage('Write Env File & Run Container') {
+        stage('Write .env File from Secret') {
             steps {
                 withCredentials([string(credentialsId: 'ts-auth-service-1625-env', variable: 'ENV_CONTENT')]) {
-                    sh '''
-                        echo "$ENV_CONTENT" > .env
-
-                        docker rm -f $CONTAINER_NAME || true
-
-                        docker run -d --name $CONTAINER_NAME \
-                          --env-file .env \
-                          -p $EXPOSED_PORT:$INTERNAL_PORT \
-                          $IMAGE_NAME
-                    '''
+                    sh 'echo "$ENV_CONTENT" > .env'
                 }
+            }
+        }
+
+        stage('Run Docker Container with dotenv-expand') {
+            steps {
+                sh """
+                    docker rm -f $CONTAINER_NAME || true
+
+                    docker run -d --name $CONTAINER_NAME \
+                      --env-file .env \
+                      -p $EXPOSED_PORT:$INTERNAL_PORT \
+                      $IMAGE_NAME
+                """
             }
         }
 
@@ -69,6 +73,9 @@ pipeline {
         }
         failure {
             echo "❌ Dev Promotion Failed!"
+        }
+        always {
+            sh 'rm -f .env || true'
         }
     }
 }

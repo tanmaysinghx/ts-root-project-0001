@@ -19,15 +19,15 @@ pipeline {
         stage('Write .env File from Secret') {
             steps {
                 withCredentials([string(credentialsId: 'ts-auth-service-1625-env', variable: 'ENV_CONTENT')]) {
-                    // Write the content safely to .env
+                    // Write the environment variables content safely to a .env file
                     sh 'echo "$ENV_CONTENT" > .env'
                 }
-                // Optional debug step - remove or comment out when not troubleshooting
+                // Optional debug step - uncomment for troubleshooting
                 // sh 'cat .env'
             }
         }
 
-        stage('Run Docker Container with dotenv-expand') {
+        stage('Run Docker Container with --env-file') {
             steps {
                 sh """
                     docker rm -f $CONTAINER_NAME || true
@@ -42,19 +42,19 @@ pipeline {
 
         stage('Start Ngrok Tunnel') {
             steps {
-                sh '''
+                sh """
                     pkill ngrok || true
                     ngrok authtoken $NGROK_AUTH
-                    nohup ngrok http 1625 > ngrok.log 2>&1 &
+                    nohup ngrok http $EXPOSED_PORT > ngrok.log 2>&1 &
                     sleep 5
-                '''
+                """
             }
         }
 
         stage('Get Ngrok URL') {
             steps {
                 script {
-                    def url = sh(
+                    def url = sh (
                         script: "curl -s http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url",
                         returnStdout: true
                     ).trim()
@@ -65,7 +65,7 @@ pipeline {
 
         stage('Verify Deployment') {
             steps {
-                sh 'curl -f http://localhost:1625/v2/api/health/health-check || exit 1'
+                sh "curl -f http://localhost:$EXPOSED_PORT/v2/api/health/health-check || exit 1"
             }
         }
     }
@@ -78,7 +78,7 @@ pipeline {
             echo "❌ Dev Promotion Failed!"
         }
         always {
-            // Cleanup .env securely
+            // Cleanup .env securely after the pipeline finishes
             sh 'rm -f .env || true'
         }
     }

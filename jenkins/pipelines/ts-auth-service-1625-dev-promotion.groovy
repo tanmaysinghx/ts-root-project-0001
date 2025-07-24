@@ -7,11 +7,6 @@ pipeline {
         NGROK_AUTH = credentials('ngrok-auth-token')
         EXPOSED_PORT = "1625"
         INTERNAL_PORT = "1625"
-
-        // 👇 Secure Secrets (stored in Jenkins credentials → Secret Text)
-        ACCESS_TOKEN_SECRET = credentials('access-token-secret')
-        REFRESH_TOKEN_SECRET = credentials('refresh-token-secret')
-        DATABASE_URL = credentials('ts-auth-service-1625-db-url')
     }
 
     stages {
@@ -21,17 +16,20 @@ pipeline {
             }
         }
 
-        stage('Run Container') {
+        stage('Write Env File & Run Container') {
             steps {
-                sh """
-                    docker rm -f $CONTAINER_NAME || true
-                    docker run -d --name $CONTAINER_NAME \
-                      -p $EXPOSED_PORT:$INTERNAL_PORT \
-                      -e ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET \
-                      -e REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET \
-                      -e DATABASE_URL=$DATABASE_URL \
-                      $IMAGE_NAME
-                """
+                withCredentials([string(credentialsId: 'ts-auth-service-1625-env', variable: 'ENV_CONTENT')]) {
+                    sh '''
+                        echo "$ENV_CONTENT" > .env
+
+                        docker rm -f $CONTAINER_NAME || true
+
+                        docker run -d --name $CONTAINER_NAME \
+                          --env-file .env \
+                          -p $EXPOSED_PORT:$INTERNAL_PORT \
+                          $IMAGE_NAME
+                    '''
+                }
             }
         }
 
@@ -60,9 +58,7 @@ pipeline {
 
         stage('Verify Deployment') {
             steps {
-                script {
-                    sh 'curl -f http://localhost:1625/v2/api/health/health-check || exit 1'
-                }
+                sh 'curl -f http://localhost:1625/v2/api/health/health-check || exit 1'
             }
         }
     }

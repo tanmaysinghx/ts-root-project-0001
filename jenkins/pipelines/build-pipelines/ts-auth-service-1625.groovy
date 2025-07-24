@@ -1,23 +1,18 @@
 pipeline {
-  agent {
-    docker {
-      image 'node:18' // Node.js image with npm installed
-      args '-v /var/run/docker.sock:/var/run/docker.sock' // So Docker commands work inside container
-    }
-  }
+  agent any
 
   environment {
     IMAGE_NAME = "tanmaysinghx/ts-auth-service-1625:latest"
   }
 
   stages {
-    stage('Checkout') {
+    stage('Checkout Root Repo') {
       steps {
         checkout scm
       }
     }
 
-    stage('Clone Repo') {
+    stage('Clone ts-auth-service-1625') {
       steps {
         dir('backend/ts-auth-service-1625') {
           git branch: 'main', url: 'https://github.com/tanmaysinghx/ts-auth-service-1625.git'

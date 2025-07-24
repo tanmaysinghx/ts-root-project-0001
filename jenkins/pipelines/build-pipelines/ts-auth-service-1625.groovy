@@ -1,6 +1,6 @@
 pipeline {
   agent {
-    label 'docker-enabled-node' // Ensure Jenkins agent has Docker access
+    agent any
   }
 
   environment {

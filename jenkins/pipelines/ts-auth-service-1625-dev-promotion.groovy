@@ -7,6 +7,14 @@ pipeline {
         NGROK_AUTH = credentials('ngrok-auth-token')
         EXPOSED_PORT = "1625"
         INTERNAL_PORT = "1625"
+
+        // Add your env vars here if you want
+        // Or you can inject them externally from Jenkins global env or parameters
+        DATABASE_URL = credentials('db-url') // or plain env var if configured differently
+        ACCESS_TOKEN_SECRET = credentials('access-token-secret')
+        REFRESH_TOKEN_SECRET = credentials('refresh-token-secret')
+        EMAIL_USER = credentials('email-user')
+        EMAIL_PASS = credentials('email-pass')
     }
 
     stages {
@@ -16,13 +24,17 @@ pipeline {
             }
         }
 
-        stage('Write .env File from Secret') {
+        stage('Write .env File From Jenkins Environment Variables') {
             steps {
-                withCredentials([string(credentialsId: 'ts-auth-service-1625-env', variable: 'ENV_CONTENT')]) {
-                    // Write the environment variables content safely to a .env file
-                    sh 'echo "$ENV_CONTENT" > .env'
-                }
-                // Optional debug step - uncomment for troubleshooting
+                // Compose the .env file from Jenkins env vars
+                sh """
+                    echo "DATABASE_URL=$DATABASE_URL" > .env
+                    echo "ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET" >> .env
+                    echo "REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET" >> .env
+                    echo "EMAIL_USER=$EMAIL_USER" >> .env
+                    echo "EMAIL_PASS=$EMAIL_PASS" >> .env
+                """
+                // Optional debug - uncomment if troubleshooting
                 // sh 'cat .env'
             }
         }
@@ -54,7 +66,7 @@ pipeline {
         stage('Get Ngrok URL') {
             steps {
                 script {
-                    def url = sh (
+                    def url = sh(
                         script: "curl -s http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url",
                         returnStdout: true
                     ).trim()
@@ -78,7 +90,6 @@ pipeline {
             echo "❌ Dev Promotion Failed!"
         }
         always {
-            // Cleanup .env securely after the pipeline finishes
             sh 'rm -f .env || true'
         }
     }

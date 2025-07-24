@@ -38,7 +38,7 @@ REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
     stage('Build Docker Image') {
       steps {
         // Build image without copying .env
-        sh 'docker build -t ${DOCKER_IMAGE} .'
+        sh 'docker build --network=host -t ${DOCKER_IMAGE} .'
       }
     }
 

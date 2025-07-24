@@ -1,7 +1,5 @@
 pipeline {
-  agent {
-    agent any
-  }
+  agent any
 
   environment {
     IMAGE_NAME = "tanmaysinghx/ts-auth-service-1625:latest"
@@ -22,17 +20,19 @@ pipeline {
       }
     }
 
-    stage('Install & Build in Node Docker') {
-      agent {
-        docker {
-          image 'node:18'
-          args '-u root' // allow installing if any permission issues
-        }
-      }
+    stage('Install & Build') {
       steps {
         dir('backend/ts-auth-service-1625') {
-          sh 'npm install'
-          sh 'npm run build'
+          // Run build inside node:18 Docker container
+          script {
+            sh '''
+              docker run --rm \
+                -v $(pwd):/app \
+                -w /app \
+                node:18 \
+                sh -c "npm install && npm run build"
+            '''
+          }
         }
       }
     }

@@ -19,8 +19,11 @@ pipeline {
         stage('Write .env File from Secret') {
             steps {
                 withCredentials([string(credentialsId: 'ts-auth-service-1625-env', variable: 'ENV_CONTENT')]) {
+                    // Write the content safely to .env
                     sh 'echo "$ENV_CONTENT" > .env'
                 }
+                // Optional debug step - remove or comment out when not troubleshooting
+                // sh 'cat .env'
             }
         }
 
@@ -29,10 +32,10 @@ pipeline {
                 sh """
                     docker rm -f $CONTAINER_NAME || true
 
-                    docker run -d --name $CONTAINER_NAME \
-                      --env-file .env \
-                      -p $EXPOSED_PORT:$INTERNAL_PORT \
-                      $IMAGE_NAME
+                    docker run -d --name $CONTAINER_NAME \\
+                        --env-file .env \\
+                        -p $EXPOSED_PORT:$INTERNAL_PORT \\
+                        $IMAGE_NAME
                 """
             }
         }
@@ -42,7 +45,7 @@ pipeline {
                 sh '''
                     pkill ngrok || true
                     ngrok authtoken $NGROK_AUTH
-                    nohup ngrok http 1625 > ngrok.log &
+                    nohup ngrok http 1625 > ngrok.log 2>&1 &
                     sleep 5
                 '''
             }
@@ -75,6 +78,7 @@ pipeline {
             echo "❌ Dev Promotion Failed!"
         }
         always {
+            // Cleanup .env securely
             sh 'rm -f .env || true'
         }
     }

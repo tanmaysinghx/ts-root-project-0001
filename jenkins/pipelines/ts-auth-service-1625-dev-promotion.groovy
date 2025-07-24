@@ -4,52 +4,75 @@ pipeline {
     environment {
         IMAGE_NAME = "tanmaysinghx/ts-auth-service-1625:latest"
         CONTAINER_NAME = "ts-auth-service-1625-dev"
+        NGROK_AUTH = credentials('ngrok-auth-token')
         EXPOSED_PORT = "1625"
-        INTERNAL_PORT = "1625"
+        INTERNAL_PORT = "8080"
+
+        // 👇 Secure Secrets (stored in Jenkins credentials → Secret Text)
+        ACCESS_TOKEN_SECRET = credentials('access-token-secret')
+        REFRESH_TOKEN_SECRET = credentials('refresh-token-secret')
+        DATABASE_URL = credentials('ts-auth-service-1625-db-url')
     }
 
     stages {
-        stage('Pull Image') {
+        stage('Pull Docker Image') {
             steps {
                 sh "docker pull $IMAGE_NAME"
             }
         }
 
-        stage('Copy .env') {
+        stage('Run Container') {
             steps {
-                sh 'cp /var/jenkins_home/envs/ts-auth-service-1625.env .env'
+                sh """
+                    docker rm -f $CONTAINER_NAME || true
+                    docker run -d --name $CONTAINER_NAME \
+                      -p $EXPOSED_PORT:$INTERNAL_PORT \
+                      -e ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET \
+                      -e REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET \
+                      -e DATABASE_URL=$DATABASE_URL \
+                      $IMAGE_NAME
+                """
             }
         }
 
-        stage('Unpack Aiven CA Cert') {
+        stage('Start Ngrok Tunnel') {
             steps {
-                withCredentials([file(credentialsId: 'aiven-ca-cert', variable: 'AIVEN_CA')]) {
-                    sh '''
-                        mkdir -p certs
-                        cp "$AIVEN_CA" certs/ca.pem
-                    '''
+                sh '''
+                    pkill ngrok || true
+                    ngrok authtoken $NGROK_AUTH
+                    nohup ngrok http 1625 > ngrok.log &
+                    sleep 5
+                '''
+            }
+        }
+
+        stage('Get Ngrok URL') {
+            steps {
+                script {
+                    def url = sh(
+                        script: "curl -s http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url",
+                        returnStdout: true
+                    ).trim()
+                    echo "🌍 App Available via Ngrok: $url"
                 }
             }
         }
 
-        stage('Run Container with Cert') {
+        stage('Verify Deployment') {
             steps {
-                sh '''
-                    docker rm -f $CONTAINER_NAME || true
-
-                    docker run -d --name $CONTAINER_NAME \
-                      --env-file .env \
-                      -v $PWD/certs:/certs \
-                      -p $EXPOSED_PORT:$INTERNAL_PORT \
-                      $IMAGE_NAME
-                '''
+                script {
+                    sh 'curl -f http://localhost:1625/v2/api/health/health-check || exit 1'
+                }
             }
         }
     }
 
     post {
-        always {
-            sh 'rm -rf .env certs || true'
+        success {
+            echo "✅ Dev Promotion Pipeline Completed Successfully!"
+        }
+        failure {
+            echo "❌ Dev Promotion Failed!"
         }
     }
 }

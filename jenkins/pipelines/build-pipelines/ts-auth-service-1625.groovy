@@ -38,7 +38,13 @@ REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
     stage('Build Docker Image') {
       steps {
         // Build image without copying .env
-        sh 'docker build --network=host -t ${DOCKER_IMAGE} .'
+        sh """
+docker build \
+  --build-arg DATABASE_URL="${env.DATABASE_URL}" \
+  --build-arg ACCESS_TOKEN_SECRET="${env.ACCESS_TOKEN_SECRET}" \
+  --build-arg REFRESH_TOKEN_SECRET="${env.REFRESH_TOKEN_SECRET}" \
+  -t tanmaysinghx/ts-auth-service-1625:latest .
+"""
       }
     }
 

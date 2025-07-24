@@ -1,11 +1,22 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'node:18' // Node.js image with npm installed
+      args '-v /var/run/docker.sock:/var/run/docker.sock' // So Docker commands work inside container
+    }
+  }
 
   environment {
     IMAGE_NAME = "tanmaysinghx/ts-auth-service-1625:latest"
   }
 
   stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
     stage('Clone Repo') {
       steps {
         dir('backend/ts-auth-service-1625') {
@@ -17,10 +28,8 @@ pipeline {
     stage('Install & Build') {
       steps {
         dir('backend/ts-auth-service-1625') {
-          sh '''
-            npm install
-            npm run build
-          '''
+          sh 'npm install'
+          sh 'npm run build'
         }
       }
     }

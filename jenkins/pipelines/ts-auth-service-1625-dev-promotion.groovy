@@ -11,7 +11,7 @@ pipeline {
         // 👇 Secure Secrets (stored in Jenkins credentials → Secret Text)
         ACCESS_TOKEN_SECRET = credentials('access-token-secret')
         REFRESH_TOKEN_SECRET = credentials('refresh-token-secret')
-        DATABASE_URL = credentials('auth-db-url')
+        DATABASE_URL = credentials('ts-auth-service-1625-db-url')
     }
 
     stages {

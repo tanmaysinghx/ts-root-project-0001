@@ -6,7 +6,7 @@ pipeline {
         CONTAINER_NAME = "ts-auth-service-1625-dev"
         NGROK_AUTH = credentials('ngrok-auth-token')
         EXPOSED_PORT = "1625"
-        INTERNAL_PORT = "8080"
+        INTERNAL_PORT = "1625"
 
         // 👇 Secure Secrets (stored in Jenkins credentials → Secret Text)
         ACCESS_TOKEN_SECRET = credentials('access-token-secret')

@@ -9,7 +9,18 @@ pipeline {
     stage('Clone Repo') {
       steps {
         dir('backend/ts-auth-service-1625') {
-           git branch: 'main', url: 'https://github.com/tanmaysinghx/ts-auth-service-1625.git'
+          git branch: 'main', url: 'https://github.com/tanmaysinghx/ts-auth-service-1625.git'
+        }
+      }
+    }
+
+    stage('Install & Build') {
+      steps {
+        dir('backend/ts-auth-service-1625') {
+          sh '''
+            npm install
+            npm run build
+          '''
         }
       }
     }

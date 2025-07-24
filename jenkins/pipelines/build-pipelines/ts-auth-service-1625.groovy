@@ -2,52 +2,56 @@ pipeline {
     agent any
 
     environment {
-        SERVICE_REPO = 'https://github.com/tanmaysinghx/ts-auth-service-1625.git'
-        SERVICE_DIR = 'ts-auth-service-1625'
-        DOCKER_IMAGE = 'tanmaysinghx/ts-auth-service'
+        DOCKER_IMAGE = 'tanmaysinghx/ts-auth-service-1625:latest'
     }
 
     stages {
-        stage('Clone ts-auth-service') {
+        stage('Checkout') {
             steps {
-                git url: "${SERVICE_REPO}", branch: 'main'
+                git url: 'https://github.com/tanmaysinghx/ts-auth-service-1625.git', branch: 'main'
             }
         }
 
-        stage('Install & Build in Node Docker') {
+        stage('Install & Build in Node Container') {
             steps {
-                sh '''
-                    docker run --rm -v $PWD:/app -w /app node:18 \
-                    sh -c "npm install && npm run build"
-                '''
+                script {
+                    docker.image('node:18').inside('-u root') {
+                        sh 'npm install'
+                        sh 'npm run build'
+                    }
+                }
             }
         }
 
-        stage('Docker Build') {
+        stage('Login to Docker Hub') {
             steps {
-                sh 'docker build -t ts-auth-service:latest .'
-            }
-        }
-
-        stage('Docker Push') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh '''
-                        echo "$PASSWORD" | docker login -u "$USERNAME" --password-stdin
-                        docker tag ts-auth-service:latest $DOCKER_IMAGE:latest
-                        docker push $DOCKER_IMAGE:latest
+                        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
                     '''
                 }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE .'
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh 'docker push $DOCKER_IMAGE'
             }
         }
     }
 
     post {
-        failure {
-            echo "❌ Build or push failed."
-        }
         success {
-            echo "✅ Successfully built and pushed Docker image: $DOCKER_IMAGE:latest"
+            echo "✅ Successfully pushed image: $DOCKER_IMAGE"
+        }
+        failure {
+            echo "❌ Build or push failed!"
         }
     }
 }

@@ -8,7 +8,7 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        git 'https://github.com/your-org/ts-auth-service'
+        git 'https://github.com/tanmaysinghx/ts-auth-service-1625'
       }
     }
 

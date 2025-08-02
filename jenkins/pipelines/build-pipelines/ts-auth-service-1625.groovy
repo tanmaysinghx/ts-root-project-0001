@@ -6,6 +6,7 @@ pipeline {
   }
 
   stages {
+
     stage('Checkout') {
       steps {
         git branch: 'main',
@@ -16,8 +17,8 @@ pipeline {
 
     stage('Setup .env') {
       steps {
-        withCredentials([file(credentialsId: 'ts-auth-env', variable: 'ENV_SECRET')]) {
-          sh 'cp $ENV_SECRET $ENV_FILE'
+        withCredentials([file(credentialsId: 'ts-auth.env', variable: 'ENV_SECRET')]) {
+          sh 'cp "$ENV_SECRET" "$ENV_FILE"'
         }
       }
     }
@@ -39,4 +40,3 @@ pipeline {
     }
   }
 }
-        

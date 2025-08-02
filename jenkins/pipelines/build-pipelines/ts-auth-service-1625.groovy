@@ -10,6 +10,8 @@ pipeline {
     REFRESH_TOKEN_SECRET = credentials('TS_1625_REFRESH_TOKEN_SECRET')
     DOCKER_USERNAME = credentials('DOCKER_USERNAME')
     DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')
+    PORT = credentials('PORT_1625')
+    API_VERSION = credentials('API_VERSION_1625')
   }
 
   stages {

@@ -6,19 +6,20 @@ pipeline {
   }
 
   stages {
-
-    stage('Checkout') {
+    stage('Checkout Code') {
       steps {
-        git branch: 'main',
-            url: 'https://github.com/tanmaysinghx/ts-auth-service-1625.git',
-            credentialsId: 'github-token'
+        dir('ts-auth-service-1625') {
+          git branch: 'main',
+              url: 'https://github.com/tanmaysinghx/ts-auth-service-1625.git',
+              credentialsId: 'github-token'
+        }
       }
     }
 
     stage('Setup .env') {
       steps {
         withCredentials([file(credentialsId: 'ts-auth.env', variable: 'ENV_SECRET')]) {
-          sh 'cp "$ENV_SECRET" "$ENV_FILE"'
+          sh 'cp "$ENV_SECRET" "ts-auth-service-1625/.env"'
         }
       }
     }

@@ -39,7 +39,6 @@ REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
 
     stage('Build Docker Image') {
       steps {
-        // Build image without copying .env
         sh """
 docker build \
   --build-arg DATABASE_URL="${env.DATABASE_URL}" \
@@ -53,13 +52,6 @@ docker build \
     stage('Push Docker Image') {
       steps {
         sh 'docker push ${DOCKER_IMAGE}'
-      }
-    }
-
-    stage('Deploy Container') {
-      steps {
-        sh 'docker stop ts-auth-service-1625 || true && docker rm ts-auth-service-1625 || true'
-        sh 'docker run -d --name ts-auth-service-1625 --env-file .env -p 1625:1625 ${DOCKER_IMAGE}'
       }
     }
   }

@@ -8,7 +8,9 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        git 'https://github.com/tanmaysinghx/ts-auth-service-1625.git'
+        git branch: 'main',
+            url: 'https://github.com/tanmaysinghx/ts-auth-service-1625.git',
+            credentialsId: 'github-token'
       }
     }
 
@@ -22,7 +24,7 @@ pipeline {
 
     stage('Build Docker Image') {
       steps {
-        dir('ts-auth-service') {
+        dir('ts-auth-service-1625') {
           sh 'docker-compose build'
         }
       }
@@ -30,10 +32,11 @@ pipeline {
 
     stage('Run or Push') {
       steps {
-        dir('ts-auth-service') {
+        dir('ts-auth-service-1625') {
           sh 'docker-compose up -d'
         }
       }
     }
   }
 }
+        

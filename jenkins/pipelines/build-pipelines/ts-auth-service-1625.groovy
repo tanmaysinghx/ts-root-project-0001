@@ -30,7 +30,7 @@ pipeline {
     withCredentials([file(credentialsId: 'ts-auth-env', variable: 'ENV_SECRET')]) {
       sh '''
         mkdir -p ts-auth-service-1625
-        sudo chown -R $(whoami) ts-auth-service-1625
+        chown -R $(whoami) ts-auth-service-1625 || true
         cp "$ENV_SECRET" ts-auth-service-1625/.env
         chmod 600 ts-auth-service-1625/.env
       '''

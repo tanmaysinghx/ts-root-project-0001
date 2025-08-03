@@ -2,58 +2,47 @@ pipeline {
   agent any
 
   environment {
-    SERVICE_NAME = 'ts-auth-service-1625'
-    ENV_FILE = "${SERVICE_NAME}/.env"
+    TS_1625_DATABASE_URL         = credentials('TS_1625_DATABASE_URL')
+    TS_1625_ACCESS_TOKEN_SECRET  = credentials('TS_1625_ACCESS_TOKEN_SECRET')
+    TS_1625_REFRESH_TOKEN_SECRET = credentials('TS_1625_REFRESH_TOKEN_SECRET')
   }
 
   stages {
-    stage('Checkout Root Project') {
+    stage('Checkout') {
       steps {
         git branch: 'main',
-            url: 'https://github.com/tanmaysinghx/ts-root-project-0001.git',
+            url: 'https://github.com/tanmaysinghx/ts-auth-service-1625.git',
             credentialsId: 'github-token'
       }
     }
 
-    stage('Checkout Auth Service') {
+    stage('Write .env file') {
       steps {
-        dir("${SERVICE_NAME}") {
-          git branch: 'main',
-              url: 'https://github.com/tanmaysinghx/ts-auth-service-1625.git',
-              credentialsId: 'github-token'
+        script {
+          def envContent = """
+DATABASE_URL="${TS_1625_DATABASE_URL}"
+ACCESS_TOKEN_SECRET=${TS_1625_ACCESS_TOKEN_SECRET}
+REFRESH_TOKEN_SECRET=${TS_1625_REFRESH_TOKEN_SECRET}
+PORT=1625
+API_VERSION=v2
+"""
+          writeFile file: '.env', text: envContent.trim()
         }
+
+        // Optional: verify content (without secrets)
+        sh 'cat .env | grep -v SECRET'
       }
     }
-
-    stage('Setup .env') {
-  steps {
-    withCredentials([file(credentialsId: 'ts-auth-env', variable: 'ENV_SECRET')]) {
-      dir('ts-auth-service-1625') {
-        sh '''
-          echo "[INFO] Writing .env file..."
-          cp "$ENV_SECRET" .env
-          chmod 600 .env
-          ls -la .env
-        '''
-      }
-    }
-  }
-}
-
 
     stage('Build Docker Image') {
       steps {
-        dir("${SERVICE_NAME}") {
-          sh 'docker compose build'
-        }
+        sh 'docker-compose build'
       }
     }
 
-    stage('Run Docker') {
+    stage('Run Docker Container') {
       steps {
-        dir("${SERVICE_NAME}") {
-          sh 'docker compose up -d'
-        }
+        sh 'docker-compose up -d'
       }
     }
   }

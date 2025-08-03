@@ -2,11 +2,10 @@ pipeline {
   agent any
 
   environment {
-    TS_1625_DATABASE_URL          = credentials('TS_1625_DATABASE_URL')
-    TS_1625_ACCESS_TOKEN_SECRET   = credentials('TS_1625_ACCESS_TOKEN_SECRET')
-    TS_1625_REFRESH_TOKEN_SECRET  = credentials('TS_1625_REFRESH_TOKEN_SECRET')
-    DOCKER_REGISTRY_CREDENTIALS   = credentials('dockerhub-creds')
-    DOCKER_IMAGE_NAME             = 'tanmaysinghx/ts-auth-service-1625'
+    TS_1625_DATABASE_URL         = credentials('TS_1625_DATABASE_URL')
+    TS_1625_ACCESS_TOKEN_SECRET  = credentials('TS_1625_ACCESS_TOKEN_SECRET')
+    TS_1625_REFRESH_TOKEN_SECRET = credentials('TS_1625_REFRESH_TOKEN_SECRET')
+    DOCKER_IMAGE_NAME            = 'tanmaysinghx/ts-auth-service-1625'
   }
 
   stages {
@@ -24,16 +23,15 @@ pipeline {
           script {
             def envContent = """
 DATABASE_URL="${TS_1625_DATABASE_URL}"
-ACCESS_TOKEN_SECRET=${TS_1625_ACCESS_TOKEN_SECRET}
-REFRESH_TOKEN_SECRET=${TS_1625_REFRESH_TOKEN_SECRET}
+ACCESS_TOKEN_SECRET="${TS_1625_ACCESS_TOKEN_SECRET}"
+REFRESH_TOKEN_SECRET="${TS_1625_REFRESH_TOKEN_SECRET}"
 PORT=1625
 API_VERSION=v2
 """
+            // First ensure the file does not exist (if any previous run left it)
+            sh 'rm -f .env'
             writeFile file: '.env', text: envContent.trim()
           }
-
-          // Optional: show env preview (hide secrets)
-          sh 'cat .env | grep -v SECRET'
         }
       }
     }
@@ -56,10 +54,15 @@ API_VERSION=v2
 
     stage('Push to Docker Hub') {
       steps {
-        script {
-          docker.withRegistry('', 'docker-hub-credentials') {
-            sh "docker push ${DOCKER_IMAGE_NAME}:latest"
-          }
+        withCredentials([usernamePassword(
+          credentialsId: 'dockerhub-creds',
+          usernameVariable: 'DOCKERHUB_USER',
+          passwordVariable: 'DOCKERHUB_PASS'
+        )]) {
+          sh """
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
+            docker push ${DOCKER_IMAGE_NAME}:latest
+          """
         }
       }
     }

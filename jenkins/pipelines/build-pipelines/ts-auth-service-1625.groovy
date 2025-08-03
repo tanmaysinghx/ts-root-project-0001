@@ -27,7 +27,7 @@ pipeline {
 
     stage('Setup .env') {
       steps {
-        withCredentials([file(credentialsId: 'ts-auth.env', variable: 'ENV_SECRET')]) {
+        withCredentials([file(credentialsId: 'ts-auth-env', variable: 'ENV_SECRET')]) {
           // Ensure file is copied inside proper directory with correct permissions
           sh '''
             mkdir -p ${SERVICE_NAME}

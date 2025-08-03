@@ -5,8 +5,8 @@ pipeline {
     TS_1625_DATABASE_URL          = credentials('TS_1625_DATABASE_URL')
     TS_1625_ACCESS_TOKEN_SECRET   = credentials('TS_1625_ACCESS_TOKEN_SECRET')
     TS_1625_REFRESH_TOKEN_SECRET  = credentials('TS_1625_REFRESH_TOKEN_SECRET')
-    DOCKER_REGISTRY_CREDENTIALS   = credentials('docker-hub-credentials') // Replace with your Docker Hub Jenkins credential ID
-    DOCKER_IMAGE_NAME             = 'yourdockerhubusername/ts-auth-service-1625' // Replace with your actual image name
+    DOCKER_REGISTRY_CREDENTIALS   = credentials('dockerhub-creds')
+    DOCKER_IMAGE_NAME             = 'tanmaysinghx/ts-auth-service-1625'
   }
 
   stages {

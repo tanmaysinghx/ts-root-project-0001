@@ -9,13 +9,30 @@ pipeline {
   }
 
   stages {
+    stage('Clean Workspace') {
+      steps {
+        cleanWs()
+      }
+    }
+
     stage('Clone Service Repo') {
       steps {
-        // Clone directly into ts-auth-service-1625 folder
         dir('ts-auth-service-1625') {
           git branch: 'main',
               url: 'https://github.com/tanmaysinghx/ts-auth-service-1625.git',
               credentialsId: 'github-token'
+        }
+      }
+    }
+
+    stage('Inspect Files') {
+      steps {
+        dir('ts-auth-service-1625') {
+          sh '''
+            echo "---- Listing ts-auth-service-1625 dir ----"
+            ls -R .
+            echo "------------------------------------------"
+          '''
         }
       }
     }
@@ -31,17 +48,8 @@ REFRESH_TOKEN_SECRET="${TS_1625_REFRESH_TOKEN_SECRET}"
 PORT=1625
 API_VERSION=v2
 """
-            sh 'rm -f .env'
             writeFile file: '.env', text: envContent.trim()
           }
-        }
-      }
-    }
-
-    stage('Docker Compose Down (Clean Reset)') {
-      steps {
-        dir('ts-auth-service-1625') {
-          sh 'docker-compose down || true'
         }
       }
     }
@@ -49,7 +57,6 @@ API_VERSION=v2
     stage('Build Docker Image') {
       steps {
         dir('ts-auth-service-1625') {
-          // Build using the Dockerfile in this folder
           sh "docker build -t ${DOCKER_IMAGE_NAME}:latest ."
         }
       }
@@ -73,6 +80,7 @@ API_VERSION=v2
     stage('Run Docker Container') {
       steps {
         dir('ts-auth-service-1625') {
+          sh 'docker-compose down || true'
           sh 'docker-compose up -d'
         }
       }

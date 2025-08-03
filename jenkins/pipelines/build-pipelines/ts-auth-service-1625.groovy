@@ -47,7 +47,7 @@ API_VERSION=v2
     stage('Build Docker Image') {
       steps {
         dir('ts-auth-service-1625') {
-          sh "docker build -t ${DOCKER_IMAGE_NAME}:latest ts-auth-service-1625"
+          sh "docker build -t ${DOCKER_IMAGE_NAME}:latest ."
         }
       }
     }

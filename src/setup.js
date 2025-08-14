@@ -6,7 +6,7 @@ const path = require('path');
 const platform = os.platform();
 console.log(`Detected OS: ${platform}`);
 
-// Parse action arg: "clone" or "pull"
+// Parse action arg: "clone", "pull", or "install"
 const action = process.argv[2] || 'clone';
 
 // Script folder path (relative to src/)
@@ -21,6 +21,8 @@ if (platform === 'win32') {
         cmd = path.join(scriptsDir, 'clone-all.bat');
     } else if (action === 'pull') {
         cmd = path.join(scriptsDir, 'pull-all.bat');
+    } else if (action === 'install') {
+        cmd = path.join(scriptsDir, 'install-node-modules.bat');
     }
 } else {
     cmd = 'bash';
@@ -28,6 +30,8 @@ if (platform === 'win32') {
         args = [path.join(scriptsDir, 'clone-all.sh')];
     } else if (action === 'pull') {
         args = [path.join(scriptsDir, 'pull-all.sh')];
+    } else if (action === 'install') {
+        args = [path.join(scriptsDir, 'install-node-modules.sh')];
     }
 }
 
@@ -40,6 +44,7 @@ if (cmd) {
     child.on('close', (code) => {
         console.log(`Script exited with code ${code}`);
     });
+
     child.on('error', (err) => {
         console.error('Failed to start subprocess:', err);
     });

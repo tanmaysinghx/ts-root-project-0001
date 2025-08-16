@@ -52,12 +52,12 @@ bash clone-all.sh
 node src/setup.js pull
 ```
 
-### 4. Insatlling NPM dependencies (temporary will be fixed and this step will be removed)
+### 4. Installing NPM dependencies (temporary will be fixed and this step will be removed)
 ```bash
 node src/setup.js pull install
 ```
 
-### 4. Start All Services with Docker
+### 5. Start All Services with Docker
 
 From the **project root**, simply run:
 -- To Build:

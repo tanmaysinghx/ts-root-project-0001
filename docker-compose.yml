@@ -13,7 +13,7 @@ services:
       - ENV=docker
       - NODE_ENV=docker
       - WORKFLOW_API_VERSION=v1
-      - WORKFLOW_URL_PREFIX=http://ts-workflow-engine-service-1606:1606
+      - WORKFLOW_URL_PREFIX=http://ts-workflow-engine-1606:1606
     volumes:
       - ./backend/ts-api-gateway-service-1605:/usr/src/app
     env_file:
@@ -148,4 +148,17 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
-
+  # 11. ts-healthcheck-service-1699
+  # ts-healthcheck-service-1699:
+  #   build:
+  #     context: ./backend/ts-healthcheck-service-1699
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "1699:1699"
+  #   environment:
+  #     - ENV=docker
+  #     - API_VERSION=v1
+  #   volumes:
+  #     - ./backend/ts-healthcheck-service-1699:/usr/src/app
+  #   env_file:
+  #     - .env

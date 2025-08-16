@@ -13,7 +13,7 @@ services:
       - ENV=docker
       - NODE_ENV=docker
       - WORKFLOW_API_VERSION=v1
-      - WORKFLOW_URL_PREFIX=http://ts-workflow-engine-1606:1606
+      - WORKFLOW_URL_PREFIX=http://ts-workflow-engine-service-1606:1606
     volumes:
       - ./backend/ts-api-gateway-service-1605:/usr/src/app
     env_file:
@@ -147,3 +147,5 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+
+

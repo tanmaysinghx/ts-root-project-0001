@@ -9,6 +9,7 @@ git clone https://github.com/tanmaysinghx/ts-workflow-engine-service-1606.git
 git clone https://github.com/tanmaysinghx/ts-auth-service-1625.git
 git clone https://github.com/tanmaysinghx/ts-notification-service-1689.git
 git clone https://github.com/tanmaysinghx/ts-profile-engine-1676.git
+git clone https://github.com/tanmaysinghx/ts-healthcheck-service-1699.git
 cd ..
 
 REM --- FRONTEND ---

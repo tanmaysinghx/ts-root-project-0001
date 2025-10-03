@@ -75,7 +75,7 @@ services:
     env_file:
       - .env
 
-  # 5. Profile Engine
+  # 5. ts-profile-engine-1676
   ts-profile-engine-1676:
     build:
       context: ./backend/ts-profile-engine-1676
@@ -86,6 +86,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_1625}?ssl-mode=REQUIRED
       - SPRING_DATASOURCE_USERNAME=${DB_USER}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASS}
+      - AUTH_REGISTER_URL=http://ts-auth-service-1625/v2/api/auth/register
     env_file:
       - .env
 
@@ -110,10 +111,10 @@ services:
       context: ./frontend/ts-pmt-ui-1725
       dockerfile: Dockerfile
     ports:
-      - "1725:1725"
+      - "1725:80"
     volumes:
       - ./frontend/ts-pmt-ui-1725:/usr/src/app
-    command: ng serve --host 0.0.0.0 --port 1725 --poll 500
+    #command: ng serve --host 0.0.0.0 --port 1725 --poll 500
     # For production:
     # command: npx http-server ./dist/ts-pmt-ui-1725 -p 1725
 
@@ -147,6 +148,24 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+
+  # 11. ts-ticketing-service-1674
+  ts-ticketing-service-1674:
+    build:
+      context: ./backend/ts-ticketing-service-1674
+      dockerfile: Dockerfile
+    ports:
+      - "1674:1674"
+    environment:
+      - DB_URI=mongodb+srv://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority
+      - ENV=docker
+      - API_VERSION=v1
+      - KAFKA_BROKER=kafka:9092
+      - PORT=1674
+    volumes:
+      - ./backend/ts-ticketing-service-1674:/usr/src/app
+    env_file:
+      - .env
 
   # 11. ts-healthcheck-service-1699
   # ts-healthcheck-service-1699:

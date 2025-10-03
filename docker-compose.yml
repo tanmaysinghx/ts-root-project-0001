@@ -157,7 +157,7 @@ services:
     ports:
       - "1674:1674"
     environment:
-      - DB_URI=mongodb+srv://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority
+      - DB_URI=mongodb+srv://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}/${MONGO_DB_1674}?retryWrites=true&w=majority
       - ENV=docker
       - API_VERSION=v1
       - KAFKA_BROKER=kafka:9092

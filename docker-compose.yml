@@ -149,10 +149,10 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
-  # 11. ts-ticketing-service-1674
-  ts-ticketing-service-1674:
+  # 11. ts-ticket-service-1674
+  ts-ticket-service-1674:
     build:
-      context: ./backend/ts-ticketing-service-1674
+      context: ./backend/ts-ticket-service-1674
       dockerfile: Dockerfile
     ports:
       - "1674:1674"
@@ -163,7 +163,7 @@ services:
       - KAFKA_BROKER=kafka:9092
       - PORT=1674
     volumes:
-      - ./backend/ts-ticketing-service-1674:/usr/src/app
+      - ./backend/ts-ticket-service-1674:/usr/src/app
     env_file:
       - .env
 

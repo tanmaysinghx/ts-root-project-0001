@@ -1,173 +1,9 @@
 version: "3.8"
 
 services:
-  # 1. ts-api-gateway-service-1605
-  ts-api-gateway-service-1605:
-    build:
-      context: ./backend/ts-api-gateway-service-1605
-      dockerfile: Dockerfile
-    ports:
-      - "1605:1605"
-    environment:
-      - DATABASE_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_1605}?ssl-mode=REQUIRED
-      - ENV=docker
-      - NODE_ENV=docker
-      - WORKFLOW_API_VERSION=v1
-      - WORKFLOW_URL_PREFIX=http://ts-workflow-engine-service-1606:1606
-    volumes:
-      - ./backend/ts-api-gateway-service-1605:/usr/src/app
-    env_file:
-      - .env
+  ############################################################# Backend Services #############################################################
 
-  # 2. ts-workflow-engine-service-1606
-  ts-workflow-engine-service-1606:
-    build:
-      context: ./backend/ts-workflow-engine-service-1606
-      dockerfile: Dockerfile
-    ports:
-      - "1606:1606"
-    environment:
-      - DATABASE_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_1606}?ssl-mode=REQUIRED
-      - ENV=docker
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - API_VERSION=v1
-      - PORT=1606
-      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
-      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
-    volumes:
-      - ./backend/ts-workflow-engine-service-1606:/usr/src/app
-    env_file:
-      - .env
-
-  # 3. ts-auth-service-1625
-  ts-auth-service-1625:
-    build:
-      context: ./backend/ts-auth-service-1625
-      dockerfile: Dockerfile
-    ports:
-      - "1625:1625"
-    environment:
-      - DATABASE_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_1625}?ssl-mode=REQUIRED
-      - ENV=docker
-      - API_VERSION=v2
-      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
-      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
-    volumes:
-      - ./backend/ts-auth-service-1625:/usr/src/app
-    env_file:
-      - .env
-
-  # 4. ts-notification-service-1689
-  ts-notification-service-1689:
-    build:
-      context: ./backend/ts-notification-service-1689
-      dockerfile: Dockerfile
-    ports:
-      - "1689:1689"
-    environment:
-      - DATABASE_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_1689}?ssl-mode=REQUIRED
-      - ENV=docker
-      - EMAIL_USER=${EMAIL_USER}
-      - EMAIL_PASS=${EMAIL_PASS}
-    volumes:
-      - ./backend/ts-notification-service-1689:/usr/src/app
-    env_file:
-      - .env
-
-  # 5. ts-profile-engine-1676
-  ts-profile-engine-1676:
-    build:
-      context: ./backend/ts-profile-engine-1676
-      dockerfile: Dockerfile
-    ports:
-      - "1676:1676"
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_1625}?ssl-mode=REQUIRED
-      - SPRING_DATASOURCE_USERNAME=${DB_USER}
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASS}
-      - AUTH_REGISTER_URL=http://ts-auth-service-1625/v2/api/auth/register
-    env_file:
-      - .env
-
-  # 6. UMT Frontend (Angular)
-  ts-umt-ui-1780:
-    build:
-      context: ./frontend/ts-umt-ui-1780
-      dockerfile: Dockerfile
-    ports:
-      - "1780:80"
-    volumes:
-      - ./frontend/ts-umt-ui-1780:/usr/src/app
-      # Optional for node_modules persistence:
-      # - /usr/src/app/node_modules
-    # command: ng serve --host 0.0.0.0 --port 1780 --poll 500
-    # For production:
-    # command: npx http-server ./dist/ts-umt-ui-1780 -p 1780
-
-  # 7. PMT Frontend (Angular)
-  ts-pmt-ui-1725:
-    build:
-      context: ./frontend/ts-pmt-ui-1725
-      dockerfile: Dockerfile
-    ports:
-      - "1725:80"
-    volumes:
-      - ./frontend/ts-pmt-ui-1725:/usr/src/app
-    #command: ng serve --host 0.0.0.0 --port 1725 --poll 500
-    # For production:
-    # command: npx http-server ./dist/ts-pmt-ui-1725 -p 1725
-
-  # 8. Redis
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-
-  # 9. Kafka
-  kafka:
-    image: confluentinc/cp-kafka:7.5.0
-    container_name: kafka
-    ports:
-      - "9092:9092"
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
-  # 10. Zookeeper
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
-  # 11. ts-ticket-service-1674
-  ts-ticket-service-1674:
-    build:
-      context: ./backend/ts-ticket-service-1674
-      dockerfile: Dockerfile
-    ports:
-      - "1674:1674"
-    environment:
-      - DB_URI=mongodb+srv://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}/${MONGO_DB_1674}?retryWrites=true&w=majority
-      - ENV=docker
-      - API_VERSION=v1
-      - KAFKA_BROKER=kafka:9092
-      - PORT=1674
-    volumes:
-      - ./backend/ts-ticket-service-1674:/usr/src/app
-    env_file:
-      - .env
-
-  # 12. ts-api-engine-service-1606
+  # 1. ts-api-engine-service-1606
   ts-api-engine-service-1606:
     build:
       context: ./backend/ts-api-engine-service-1606
@@ -186,6 +22,137 @@ services:
     env_file:
       - .env
 
+  # 2. ts-auth-service-1625
+  ts-auth-service-1625:
+    build:
+      context: ./backend/ts-auth-service-1625
+      dockerfile: Dockerfile
+    ports:
+      - "1625:1625"
+    environment:
+      - DATABASE_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_1625}?ssl-mode=REQUIRED
+      - ENV=docker
+      - API_VERSION=v2
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+    volumes:
+      - ./backend/ts-auth-service-1625:/usr/src/app
+    env_file:
+      - .env
+
+  # 3. ts-notification-service-1689
+  ts-notification-service-1689:
+    build:
+      context: ./backend/ts-notification-service-1689
+      dockerfile: Dockerfile
+    ports:
+      - "1689:1689"
+    environment:
+      - DATABASE_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_1689}?ssl-mode=REQUIRED
+      - ENV=docker
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+    volumes:
+      - ./backend/ts-notification-service-1689:/usr/src/app
+    env_file:
+      - .env
+
+  # 4. ts-profile-engine-1676
+  ts-profile-engine-1676:
+    build:
+      context: ./backend/ts-profile-engine-1676
+      dockerfile: Dockerfile
+    ports:
+      - "1676:1676"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_1625}?ssl-mode=REQUIRED
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASS}
+      - AUTH_REGISTER_URL=http://ts-auth-service-1625/v2/api/auth/register
+    env_file:
+      - .env
+
+    # 5. ts-ticket-service-1674
+  ts-ticket-service-1674:
+    build:
+      context: ./backend/ts-ticket-service-1674
+      dockerfile: Dockerfile
+    ports:
+      - "1674:1674"
+    environment:
+      - DB_URI=mongodb+srv://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}/${MONGO_DB_1674}?retryWrites=true&w=majority
+      - ENV=docker
+      - API_VERSION=v1
+      - KAFKA_BROKER=kafka:9092
+      - PORT=1674
+    volumes:
+      - ./backend/ts-ticket-service-1674:/usr/src/app
+    env_file:
+      - .env
+
+  ############################################################# Frontend Services #############################################################
+
+  # 1. UMT Frontend (Angular)
+  ts-umt-ui-1780:
+    build:
+      context: ./frontend/ts-umt-ui-1780
+      dockerfile: Dockerfile
+    ports:
+      - "1780:80"
+    volumes:
+      - ./frontend/ts-umt-ui-1780:/usr/src/app
+      # Optional for node_modules persistence:
+      # - /usr/src/app/node_modules
+    # command: ng serve --host 0.0.0.0 --port 1780 --poll 500
+    # For production:
+    # command: npx http-server ./dist/ts-umt-ui-1780 -p 1780
+
+  # 2. PMT Frontend (Angular)
+  ts-pmt-ui-1725:
+    build:
+      context: ./frontend/ts-pmt-ui-1725
+      dockerfile: Dockerfile
+    ports:
+      - "1725:80"
+    volumes:
+      - ./frontend/ts-pmt-ui-1725:/usr/src/app
+    #command: ng serve --host 0.0.0.0 --port 1725 --poll 500
+    # For production:
+    # command: npx http-server ./dist/ts-pmt-ui-1725 -p 1725
+
+  ############################################################# Supporting Services #############################################################
+
+  # 1. Redis
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  # 2. Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  # 3. Zookeeper
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
   # 11. ts-healthcheck-service-1699
   # ts-healthcheck-service-1699:
   #   build:
@@ -198,5 +165,46 @@ services:
   #     - API_VERSION=v1
   #   volumes:
   #     - ./backend/ts-healthcheck-service-1699:/usr/src/app
+  #   env_file:
+  #     - .env
+
+  ############################################################# Decommisoned Services #############################################################
+
+  # 1. ts-api-gateway-service-1605
+  # ts-api-gateway-service-1605:
+  #   build:
+  #     context: ./backend/ts-api-gateway-service-1605
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "1605:1605"
+  #   environment:
+  #     - DATABASE_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_1605}?ssl-mode=REQUIRED
+  #     - ENV=docker
+  #     - NODE_ENV=docker
+  #     - WORKFLOW_API_VERSION=v1
+  #     - WORKFLOW_URL_PREFIX=http://ts-workflow-engine-service-1606:1606
+  #   volumes:
+  #     - ./backend/ts-api-gateway-service-1605:/usr/src/app
+  #   env_file:
+  #     - .env
+
+  # # 2. ts-workflow-engine-service-1606
+  # ts-workflow-engine-service-1606:
+  #   build:
+  #     context: ./backend/ts-workflow-engine-service-1606
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "1606:1606"
+  #   environment:
+  #     - DATABASE_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_1606}?ssl-mode=REQUIRED
+  #     - ENV=docker
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #     - API_VERSION=v1
+  #     - PORT=1606
+  #     - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+  #     - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+  #   volumes:
+  #     - ./backend/ts-workflow-engine-service-1606:/usr/src/app
   #   env_file:
   #     - .env

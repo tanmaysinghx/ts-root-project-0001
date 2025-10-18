@@ -4,12 +4,11 @@ SETLOCAL
 REM --- BACKEND ---
 if not exist backend mkdir backend
 cd backend
-git clone https://github.com/tanmaysinghx/ts-api-gateway-service-1605.git
-git clone https://github.com/tanmaysinghx/ts-workflow-engine-service-1606.git
+git clone https://github.com/tanmaysinghx/ts-api-engine-service-1606.git
 git clone https://github.com/tanmaysinghx/ts-auth-service-1625.git
 git clone https://github.com/tanmaysinghx/ts-notification-service-1689.git
 git clone https://github.com/tanmaysinghx/ts-profile-engine-1676.git
-git clone https://github.com/tanmaysinghx/ts-healthcheck-service-1699.git
+git clone https://github.com/tanmaysinghx/ts-ticket-service-1674.git
 cd ..
 
 REM --- FRONTEND ---

@@ -1,0 +1,11 @@
+{
+  "pid": 24472,
+  "platform": "win32",
+  "startedAt": "2025-11-09T13:50:43.544Z",
+  "command": "npm",
+  "args": [
+    "run dev"
+  ],
+  "cwd": "D:\\Code\\Projects\\ts-root-project-0001\\backend\\ts-auth-service-1625",
+  "type": "Node"
+}

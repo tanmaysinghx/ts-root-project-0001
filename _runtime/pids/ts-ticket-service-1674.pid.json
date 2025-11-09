@@ -1,0 +1,11 @@
+{
+  "pid": 9316,
+  "platform": "win32",
+  "startedAt": "2025-11-09T13:50:43.568Z",
+  "command": "npm",
+  "args": [
+    "run dev"
+  ],
+  "cwd": "D:\\Code\\Projects\\ts-root-project-0001\\backend\\ts-ticket-service-1674",
+  "type": "Node"
+}

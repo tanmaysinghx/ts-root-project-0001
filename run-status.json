@@ -1,0 +1,14 @@
+[
+  {
+    "service": "ts-ticket-service-1674",
+    "type": "Node",
+    "status": "FAIL",
+    "reason": "stop failed"
+  },
+  {
+    "service": "ts-umt-ui-1780",
+    "type": "Angular",
+    "status": "FAIL",
+    "reason": "stop failed"
+  }
+]

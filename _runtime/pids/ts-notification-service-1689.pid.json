@@ -1,0 +1,11 @@
+{
+  "pid": 24396,
+  "platform": "win32",
+  "startedAt": "2025-11-09T13:50:43.549Z",
+  "command": "npm",
+  "args": [
+    "run dev"
+  ],
+  "cwd": "D:\\Code\\Projects\\ts-root-project-0001\\backend\\ts-notification-service-1689",
+  "type": "Node"
+}

@@ -1,0 +1,11 @@
+{
+  "pid": 13332,
+  "platform": "win32",
+  "startedAt": "2025-11-09T13:50:43.588Z",
+  "command": "npm",
+  "args": [
+    "start"
+  ],
+  "cwd": "D:\\Code\\Projects\\ts-root-project-0001\\frontend\\ts-pmt-ui-1725",
+  "type": "Angular"
+}

@@ -5,3 +5,4 @@ frontend/*
 # But allow Docker compose & shared Jenkins files
 !backend/.gitkeep
 !frontend/.gitkeep
+node_modules

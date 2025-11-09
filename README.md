@@ -54,7 +54,7 @@ node src/setup.js pull
 
 ### 4. Installing NPM dependencies (temporary will be fixed and this step will be removed)
 ```bash
-node src/setup.js pull install
+node src/setup.js install
 ```
 
 ### 5. Start All Services with Docker

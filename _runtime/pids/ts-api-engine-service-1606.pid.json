@@ -1,0 +1,11 @@
+{
+  "pid": 16880,
+  "platform": "win32",
+  "startedAt": "2025-11-11T16:46:00.272Z",
+  "command": "npm",
+  "args": [
+    "run dev"
+  ],
+  "cwd": "D:\\Code\\Projects\\ts-root-project-0001\\backend\\ts-api-engine-service-1606",
+  "type": "Node"
+}

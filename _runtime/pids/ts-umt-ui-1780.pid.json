@@ -1,7 +1,7 @@
 {
-  "pid": 23844,
+  "pid": 30104,
   "platform": "win32",
-  "startedAt": "2025-11-09T13:50:43.596Z",
+  "startedAt": "2025-11-11T16:46:00.297Z",
   "command": "npm",
   "args": [
     "start"

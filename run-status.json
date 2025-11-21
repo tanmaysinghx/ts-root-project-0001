@@ -6,6 +6,12 @@
     "reason": "Not selected"
   },
   {
+    "service": "ts-cicd-service-1675",
+    "type": "SpringBoot",
+    "status": "SKIP",
+    "reason": "Not selected"
+  },
+  {
     "service": "ts-notification-service-1689",
     "type": "Node",
     "status": "SKIP",

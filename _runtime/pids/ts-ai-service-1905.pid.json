@@ -1,0 +1,11 @@
+{
+  "pid": 27748,
+  "platform": "win32",
+  "startedAt": "2025-11-15T05:18:38.252Z",
+  "command": "D:\\Code\\Projects\\ts-root-project-0001\\backend\\ts-ai-service-1905\\mvnw.cmd",
+  "args": [
+    "spring-boot:run"
+  ],
+  "cwd": "D:\\Code\\Projects\\ts-root-project-0001\\backend\\ts-ai-service-1905",
+  "type": "SpringBoot"
+}

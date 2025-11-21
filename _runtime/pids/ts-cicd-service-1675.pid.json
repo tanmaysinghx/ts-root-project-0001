@@ -1,0 +1,11 @@
+{
+  "pid": 15164,
+  "platform": "win32",
+  "startedAt": "2025-11-15T05:18:38.279Z",
+  "command": "D:\\Code\\Projects\\ts-root-project-0001\\backend\\ts-cicd-service-1675\\mvnw.cmd",
+  "args": [
+    "spring-boot:run"
+  ],
+  "cwd": "D:\\Code\\Projects\\ts-root-project-0001\\backend\\ts-cicd-service-1675",
+  "type": "SpringBoot"
+}

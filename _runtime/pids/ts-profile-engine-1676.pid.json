@@ -1,0 +1,11 @@
+{
+  "pid": 19396,
+  "platform": "win32",
+  "startedAt": "2025-11-15T05:18:38.297Z",
+  "command": "D:\\Code\\Projects\\ts-root-project-0001\\backend\\ts-profile-engine-1676\\mvnw.cmd",
+  "args": [
+    "spring-boot:run"
+  ],
+  "cwd": "D:\\Code\\Projects\\ts-root-project-0001\\backend\\ts-profile-engine-1676",
+  "type": "SpringBoot"
+}

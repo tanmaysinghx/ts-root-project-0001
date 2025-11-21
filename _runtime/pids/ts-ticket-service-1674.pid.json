@@ -1,7 +1,7 @@
 {
-  "pid": 1248,
+  "pid": 1940,
   "platform": "win32",
-  "startedAt": "2025-11-11T16:46:00.282Z",
+  "startedAt": "2025-11-17T12:28:21.049Z",
   "command": "npm",
   "args": [
     "run dev"

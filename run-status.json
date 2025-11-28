@@ -6,6 +6,12 @@
     "reason": "Not selected"
   },
   {
+    "service": "ts-auth-service-1625",
+    "type": "Node",
+    "status": "SKIP",
+    "reason": "Not selected"
+  },
+  {
     "service": "ts-cicd-service-1675",
     "type": "SpringBoot",
     "status": "SKIP",
@@ -24,32 +30,26 @@
     "reason": "Not selected"
   },
   {
-    "service": "ts-api-engine-service-1606",
-    "type": "Node",
-    "status": "LAUNCHED",
-    "reason": "no readiness signal; process alive"
-  },
-  {
-    "service": "ts-auth-service-1625",
-    "type": "Node",
-    "status": "LAUNCHED",
-    "reason": "no readiness signal; process alive"
-  },
-  {
     "service": "ts-ticket-service-1674",
     "type": "Node",
-    "status": "LAUNCHED",
-    "reason": "no readiness signal; process alive"
+    "status": "SKIP",
+    "reason": "Not selected"
   },
   {
     "service": "ts-pmt-ui-1725",
     "type": "Angular",
-    "status": "LAUNCHED",
-    "reason": "no readiness signal; process alive"
+    "status": "SKIP",
+    "reason": "Not selected"
   },
   {
     "service": "ts-umt-ui-1780",
     "type": "Angular",
+    "status": "SKIP",
+    "reason": "Not selected"
+  },
+  {
+    "service": "ts-api-engine-service-1606",
+    "type": "Node",
     "status": "LAUNCHED",
     "reason": "no readiness signal; process alive"
   }
